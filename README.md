@@ -1,18 +1,18 @@
 # Memoria cache
 
-## Requerimientos:
+# Requerimientos:
 
   1. Implementar memoria cache
   2. Implementar memoria principal (RAM) (TXT)
 
-#A tomar en cuenta:
+# A tomar en cuenta:
 
   1. El direccionamiento lo puede hacer con una función aleatoria
   2. La operación de lectura se puede hacer con una función aleatoria
   3. La operación de escritura se puede hacer con una función aleatoria
   4.  La capacidad de direccionamiento del sistema es de 2048 y el tamaño de palabra 1 byte.
 
-#Características de la memoria cache:
+# Características de la memoria cache:
 
   1. Tamaño de bloque 8 bytes
   2. Total de bloques en cache 16
