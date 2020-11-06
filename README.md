@@ -2,7 +2,7 @@
 
 ## Comenzando 🚀
   1. Pre-requisitos
-  
+
 ## Requerimientos 📋
   1. Implementar la memoria cache en un lenguaje de alto nivel
   1. Implementar memoria cache
@@ -25,8 +25,9 @@
 ## Contruido con 🛠️
   * Python3
 ## MemoryCache
-  FA WT LFU
-  FA : Full Associative
-  LRU : Least – Recently Used
-  WT : Write-through: The information is written to both the block in the cache and to the block in
+
+  * FA WT LFU
+  * FA : Full Associative
+  * LRU : Least – Recently Used
+  * WT : Write-through: The information is written to both the block in the cache and to the block in
        the lower level of the memory hierarchy (main memory for a cache).
