@@ -10,7 +10,7 @@
   1. El direccionamiento se puede hacer con una función aleatoria
   2. La operación de lectura se puede hacer con una función aleatoria
   3. La operación de escritura se puede hacer con una función aleatoria
-  4.  La capacidad de direccionamiento del sistema es de 2048 y el tamaño de palabra 1 byte.
+  4. La capacidad de direccionamiento del sistema es de 2048 y el tamaño de palabra 1 byte.
 
 ## Características de la memoria cache:
 
