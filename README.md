@@ -1,7 +1,7 @@
 # Memoria cache
 
 ## Comenzando 🚀
-  1. Pre-requisitos
+  1. Definición Pre-requisitos
 
 ## Requerimientos 📋
   1. Implementar la memoria cache en un lenguaje de alto nivel
