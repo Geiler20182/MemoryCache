@@ -183,6 +183,32 @@ class MemoryMain {
 
 };
 
+
+class Output {
+
+  public:
+
+    int hit;
+    int mips;
+
+    Output() {
+
+      hit = 0;
+      mips = 0;
+
+    }
+
+    updateOutPut(string address, string data) {
+
+      string linea;
+      std::ifstream file("Output.txt");
+      file << address << " " << data << " " << endl;
+      file.close();
+
+    }
+
+
+}
 // +++ Manejar todas los paramteros de las funciones como referencia +++ //
 
 /* Firmas de funciones */
@@ -238,24 +264,6 @@ int main( int argc, char const *argv[] ) {
   MemoryMain memoryMain;
 
   leerDataMemoryMain( memoryMain );
-
-
-  memoryCache.blocks[0]->v = 1;
-  memoryCache.blocks[10]->address= "00000000000";
-  PhysicalAddress Direccion;
-  Gen(Direccion);
-//  cout << "Adrress " << Direccion.blockAddress <<" offset " << Direccion.offset<<endl;
-  Direccion.blockAddress = "00000000000";
-  int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
-
-  if(memoryCache.isHit(x)){
-    cout << 1 <<endl;
-  }
-  else{
-    cout << -1 << endl;
-  }
-
-  srand(time(NULL));
 
 
 
