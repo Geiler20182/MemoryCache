@@ -23,7 +23,7 @@
      obtuvo el sistema, al igual que el archivo txt y la memoria cache.
 
 ## Contruido con 🛠️
-  * Python3
+  * Python3 o C++
 ## MemoryCache
 
   * FA WT LFU
