@@ -41,11 +41,11 @@ class Block {
     /* Contructor */
     Block() {}
 
-    Block(int v, string address, string data) {
+    Block(int newV, string newAddress, string newData) {
 
-      this.v = v;
-      this.address = address;
-      this.data = data;
+      v = newV;
+      address = newAddress;
+      data = newData;
 
     }
 };
