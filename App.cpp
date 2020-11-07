@@ -102,10 +102,11 @@ class Cache {
     /* Atributos */
     vector< Block* > blocks;
     vector< string > setQueue;
-
+    int pos;
    /* Contructor */
    Cache() {
 
+     pos = 0;
      this->blocks =  vector<Block*>(MAX_BLOCKS);
      for (int i = 0; i < MAX_BLOCKS; i++)
        this->blocks[i] = new Block;
@@ -132,12 +133,12 @@ class Cache {
    int getPosAddress (string direccion ){
      for (int i = 0; i < MAX_BLOCKS; i++)
        if(this->blocks[i]->address == direccion) return i;
-       return -1;
+     return -1;
    }
 
-   bool isHit( int pos ){
-     if( pos != -1){
-       if( this->blocks[pos]-> v == 1 ) return  true;
+   bool isHit( int x ){
+     if( x >= 0 ){
+       if( this->blocks[x]-> v == 1 ) return  true;
        else return false;
      }
      else return false;
@@ -188,27 +189,28 @@ class Output {
 
   public:
 
-    int hit;
-    int mips;
+    int hits;
+    int miss;
 
     Output() {
 
-      hit = 0;
-      mips = 0;
+      hits = 0;
+      miss = 0;
 
     }
 
-    updateOutPut(string address, string data) {
+    updateOutput(string address, string data) {
 
       string linea;
       std::ifstream file("Output.txt");
-      file << address << " " << data << " " << endl;
+      //file << address;// << " " << data << " " << endl;
       file.close();
+      hits++;
 
     }
 
 
-}
+};
 // +++ Manejar todas los paramteros de las funciones como referencia +++ //
 
 /* Firmas de funciones */
@@ -255,19 +257,28 @@ void leerDataMemoryMain( MemoryMain & memoryMain ) {
   file.close();
 }
 
-int inicio(Cache& memoryCache, MemoryMain& MemoryMain, Output& salida ){
+int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
+
     leerDataMemoryMain( memoryMain );
     PhysicalAddress Direccion;
     Gen(Direccion);
+    cout << "\nDireccion generada: " << Direccion.blockAddress << " dec: " << stoi(Direccion.offset.c_str(), 0, 2) << '\n';
     int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
-    if(memoryCache.isHit(x)){
-      salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[atoi(Direccion.offset)] );
-    }
-    else{
-      cout << -1 << endl;
+    if (memoryCache.isHit(x)) {
+
+        cout << "*\n";
+        cout << "x: " << x << endl;
+        salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2)] );
     }
 
-    srand(time(NULL));
+    else {
+
+      memoryCache.blocks[memoryCache.pos++]->v = 1;
+      memoryCache.blocks[memoryCache.pos++]->address = Direccion.blockAddress;
+      salida.miss++;
+      cout << "Miss\n";
+    }
+
 }
 
 int main( int argc, char const *argv[] ) { // menu infinito
@@ -275,16 +286,27 @@ int main( int argc, char const *argv[] ) { // menu infinito
   /* Creando instancia de estructura Cache */
   Cache memoryCache;
   MemoryMain memoryMain;
-<<<<<<< HEAD
-
-  leerDataMemoryMain( memoryMain );
-=======
   Output salida;
-  // inicio del menu
-  inicio( memoryCache,memoryMain,salida);
->>>>>>> 50e1dd6efd753d3c18d57671feb571c7d852dadf
 
 
+  string input = "";
+  while ( input != "E" ) {
+
+    cout << "\nMemoria cache\n";
+    cout << "[G] Generar direccion\n";
+    cout << "[E] Salir\n> ";
+    cin >> input;
+
+    if (input == "G")
+      inicio(memoryCache, memoryMain, salida);
+
+  }
+
+  cout << "Taza" << '\n';
+  cout << "Hits: " << salida.hits << '\n';
+  cout << "Miss: " << salida.miss << '\n';
+
+  srand(time(NULL));
 
   return 0;
 }
