@@ -36,16 +36,44 @@ class Block {
     /* Atributos */
     int v;
     string address;
-    string data;
+    vector<string> data;
 
     /* Contructor */
-    Block() {}
+    Block() {
+      data = std::vector<string> (8); // cada linea esta bits
+    }
 
     Block(int newV, string newAddress, string newData) {
 
       v = newV;
       address = newAddress;
       data = newData;
+      string triState;
+
+    }
+};
+
+/*
+ * Estructura direccion fisica
+    Estructura encargada de simular cada instruccion fisica, teniendo
+    consigo 2 atributos, el primero (blockAddress) de tipo string para representar la direccion del bloque, el
+    segundo (offset) de tipo string para representar el block offset.
+*/
+class PhysicalAddress {
+
+  public:
+
+    /* Atributos */
+
+    string blockAddress;
+    string offset;
+
+    /* Contructor */
+    PhysicalAddress() {}
+    PhysicalAddress( string newBlockAddress, string newOffset) {
+
+      blockAddress = newBlockAddress;
+      offset = newOffset;
 
     }
 };
