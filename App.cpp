@@ -229,33 +229,29 @@ void leerDataMemoryMain( MemoryMain & memoryMain ) {
   file.close();
 }
 
-int main( int argc, char const *argv[] ) {
+int inicio(Cache& memoryCache, MemoryMain& MemoryMain, Output& salida ){
+    leerDataMemoryMain( memoryMain );
+    PhysicalAddress Direccion;
+    Gen(Direccion);
+    int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
+    if(memoryCache.isHit(x)){
+      salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[atoi(Direccion.offset)] );
+    }
+    else{
+      cout << -1 << endl;
+    }
 
-  std::cout << "Be happy!" << '\n';
+    srand(time(NULL));
+}
+
+int main( int argc, char const *argv[] ) { // menu infinito
 
   /* Creando instancia de estructura Cache */
   Cache memoryCache;
   MemoryMain memoryMain;
-
-  leerDataMemoryMain( memoryMain );
-
-
-  memoryCache.blocks[0]->v = 1;
-  memoryCache.blocks[10]->address= "00000000000";
-  PhysicalAddress Direccion;
-  Gen(Direccion);
-//  cout << "Adrress " << Direccion.blockAddress <<" offset " << Direccion.offset<<endl;
-  Direccion.blockAddress = "00000000000";
-  int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
-
-  if(memoryCache.isHit(x)){
-    cout << 1 <<endl;
-  }
-  else{
-    cout << -1 << endl;
-  }
-
-  srand(time(NULL));
+  Output salida;
+  // inicio del menu
+  inicio( memoryCache,memoryMain,salida);
 
 
 
