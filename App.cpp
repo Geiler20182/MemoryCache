@@ -43,12 +43,10 @@ class Block {
       data = std::vector<string> (8); // cada linea esta bits
     }
 
-    Block(int newV, string newAddress, string newData) {
+    Block(int newV, string newAddress) {
 
       v = newV;
       address = newAddress;
-      data = newData;
-      string triState;
 
     }
 };
@@ -100,6 +98,29 @@ class Cache {
    }
 
 };
+
+
+/*
+ * Estructura generador de direcciones:
+    Estructura encargada de generar de manera aleatoria direcciones fisicas.
+
+*/
+class Gen {
+
+  public:
+
+    /* Atributos */
+    string dir;
+    strign off;
+
+   /* Contructor */
+   Gen() {
+
+
+   }
+
+};
+
 
 // +++ Manejar todas los paramteros de las funciones como referencia +++ //
 
