@@ -12,6 +12,8 @@
 #include <iostream>
 #include <vector>
 #include <string.h>
+#include <stdlib.h>
+#include<time.h>
 
 /* Constantes en mi sistema de memoria */
 #define MAX_BLOCKS 16
@@ -42,15 +44,13 @@ class Block {
     Block() {
       data = std::vector<string> (8); // cada linea esta bits
     }
-
-    Block(int newV, string newAddress, string newData) {
+/*
+    Block(int newV, string newAddress) {
 
       v = newV;
       address = newAddress;
-      data = newData;
-      string triState;
 
-    }
+    }*/
 };
 
 /*
@@ -122,8 +122,15 @@ int main( int argc, char const *argv[] ) {
   /* Creando instancia de estructura Cache */
   Cache memoryCache;
 
-  /* Ejemplo de asignacion y modificacion */
 
+  for (int i = 0; i < 5; i++) {
+      int n = rand() % 2;
+      cout << n << endl;
+  }
+  srand(time(NULL));
+
+  /* Ejemplo de asignacion y modificacion */
+/*
   memoryCache.blocks[0]->v = 1;
 
   modificarValor( memoryCache );
@@ -134,7 +141,7 @@ int main( int argc, char const *argv[] ) {
   cout << memoryCache.blocks[0]->v << '\n';
   cout << memoryCache.blocks[0]->address << '\n';
   cout << memoryCache.blocks[0]->data << '\n';
-
+  */
   /* Fin de ejemplo */
 
   return 0;
