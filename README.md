@@ -34,4 +34,6 @@
        the lower level of the memory hierarchy (main memory for a cache).
 
 # Notas
-## Depurar escritura
+ * Revisar escritura en el Output
+ * Politicas de reemplazo
+ * Actualización

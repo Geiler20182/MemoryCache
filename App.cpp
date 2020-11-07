@@ -201,9 +201,12 @@ class Output {
 
     updateOutput(string address, string data) {
 
-      string linea;
+      /*string linea;
       std::ifstream file("Output.txt");
-      //file << address;// << " " << data << " " << endl;
+      file.close();*/
+      ofstream file;
+      file.open("Output.txt");
+      file << address << " " << data << " " << endl;
       file.close();
       hits++;
 
@@ -262,6 +265,7 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
     leerDataMemoryMain( memoryMain );
     PhysicalAddress Direccion;
     Gen(Direccion);
+
     cout << "\nDireccion generada: " << Direccion.blockAddress << " dec: " << stoi(Direccion.offset.c_str(), 0, 2) << '\n';
     int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
     if (memoryCache.isHit(x)) {
@@ -273,10 +277,15 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
     else {
 
-      memoryCache.blocks[memoryCache.pos++]->v = 1;
-      memoryCache.blocks[memoryCache.pos++]->address = Direccion.blockAddress;
-      salida.miss++;
-      cout << "Miss\n";
+      cout << "pos: " << memoryCache.pos << endl;
+      if (memoryCache.pos < 16) {
+
+        memoryCache.blocks[memoryCache.pos]->v = 1;
+        memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
+        memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData(3, 8);
+        salida.miss++;
+        cout << "Miss\n";
+      }
     }
 
 }
