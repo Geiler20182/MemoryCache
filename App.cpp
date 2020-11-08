@@ -53,9 +53,7 @@ class Block {
     vector<string> data;
 
     /* Contructor */
-    Block() {
-      data = std::vector<string> (8); // cada linea esta bits
-    }
+    Block() { }
 /*
 >>>>>>> 5c3252fdc50fbfb4d6c9eed87931b2d153462833
     Block(int newV, string newAddress) {
@@ -187,7 +185,7 @@ class MemoryMain {
 
       if (x >= 0 && y < data.size()) {
 
-        for (int i = x; i < y; i++)
+        for (int i = x; i <= y; i++)
           information.push_back(data[i]);
       }
 
@@ -282,23 +280,17 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
     int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
     if (memoryCache.isHit(x)) {
 
-        cout << "Hit: " << x << endl;
-        cout << "Cantidad data: " <<  memoryCache.blocks[x]->data.size() << endl;
-        cout << "offset: " << stoi(Direccion.offset.c_str(), 0, 2) << endl;
         salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2) ] ); // *** - 1
-        cout << "----------------\n";
     }
 
     else {
 
       //cout << "pos: " << memoryCache.pos << endl;
       if (memoryCache.pos < 16) {
-        cout << "Miss - Pos: " << memoryCache.pos << endl;
         memoryCache.blocks[memoryCache.pos]->v = 1;
         memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
         memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
         salida.miss++;
-
 
       }
     }
@@ -312,8 +304,6 @@ int main( int argc, char const *argv[] ) { // menu infinito
   MemoryMain memoryMain;
   Output salida;
   string input = "";
-
-
   int N = 1000;
   while (N-- > 0) {
 
