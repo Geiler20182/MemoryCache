@@ -89,6 +89,19 @@ class PhysicalAddress {
       offset = newOffset;
 
     }
+
+    const int getRangeInf() {
+
+        return stoi( (blockAddress + "000").c_str(), 0, 2);
+
+    }
+
+    const int getRangeSup() {
+
+      return  stoi( (blockAddress + "111").c_str(), 0, 2);
+
+    }
+
 };
 
 /*
@@ -283,7 +296,7 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
         cout << "Miss - Pos: " << memoryCache.pos << endl;
         memoryCache.blocks[memoryCache.pos]->v = 1;
         memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
-        memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData(3, 10);
+        memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
         salida.miss++;
 
 
@@ -300,9 +313,12 @@ int main( int argc, char const *argv[] ) { // menu infinito
   Output salida;
   string input = "";
 
+
   int N = 1000;
   while (N-- > 0) {
+
     inicio(memoryCache, memoryMain, salida);
+
   }
   /*
   while ( input != "E" ) {
