@@ -27,9 +27,10 @@
 
 /* Constantes en mi sistema de memoria */
 #define MAX_BLOCKS 16
-#define MAX_ADDRESS 11
+#define MAX_ADDRESS 8
 #define MAX_DATA 8
 #define MAX_DATA_MAIN 2048
+#define OFFSET 3
 
 using namespace std;
 
@@ -231,12 +232,12 @@ void Gen( PhysicalAddress & direccion ) {
     string aux="";
     string aux2="";
 
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < MAX_ADDRESS; i++) {
         int n = rand() % 2;
         aux+=to_string(n);
     }
     direccion.blockAddress = aux;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < OFFSET; i++) {
         int n = rand() % 2;
         aux2+=to_string(n);
     }
@@ -278,7 +279,7 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
     else {
 
       //cout << "pos: " << memoryCache.pos << endl;
-      if (memoryCache.pos < 15) {
+      if (memoryCache.pos < 16) {
         cout << "Miss - Pos: " << memoryCache.pos << endl;
         memoryCache.blocks[memoryCache.pos]->v = 1;
         memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
