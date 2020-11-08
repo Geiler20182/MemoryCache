@@ -193,7 +193,6 @@ class MemoryMain {
     }
 
 
-
 };
 
 /*
@@ -224,7 +223,6 @@ class Output {
       hits++;
 
     }
-
 
 };
 
@@ -267,7 +265,9 @@ void leerDataMemoryMain( MemoryMain & memoryMain ) {
     memoryMain.data.push_back(linea);
 
   }
+
   file.close();
+
 }
 
 int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
@@ -287,6 +287,7 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
       //cout << "pos: " << memoryCache.pos << endl;
       if (memoryCache.pos < 16) {
+        
         memoryCache.blocks[memoryCache.pos]->v = 1;
         memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
         memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
