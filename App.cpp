@@ -289,8 +289,6 @@ int main( int argc, char const *argv[] ) { // menu infinito
   Cache memoryCache;
   MemoryMain memoryMain;
   Output salida;
-  salida.updateOutput("10101101110", "01010110");
-  return 0;
   string input = "";
   while ( input != "E" ) {
 
