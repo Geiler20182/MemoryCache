@@ -128,8 +128,12 @@ class Cache {
    /* metodos */
 
    string getLeasRecentlyUsed() {
-
-     return setQueue[setQueue.size() - 1];
+     string q = setQueue[setQueue.size() - 1];
+     auto position  = find(setQueue.begin(), setQueue.end(), q);
+     if ( position != setQueue.end())  {
+       setQueue.erase(position);
+     }
+     return q;
 
    }
 
@@ -214,7 +218,7 @@ class Output {
 
     }
 
-    updateOutput(string address, string data) {
+    void updateOutput(string address, string data) {
 
       ofstream file;
       file.open("Output.txt", std::ofstream::app);
@@ -270,7 +274,7 @@ void leerDataMemoryMain( MemoryMain & memoryMain ) {
 
 }
 
-int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
+void  inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
     leerDataMemoryMain( memoryMain );
     PhysicalAddress Direccion;
@@ -281,18 +285,31 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
     if (memoryCache.isHit(x)) {
 
         salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2) ] ); // *** - 1
+        memoryCache.setLeasRecentlyUsed(Direccion.blockAddress);
     }
 
     else {
 
+<<<<<<< HEAD
       //cout << "pos: " << memoryCache.pos << endl;
       if (memoryCache.pos < 16) {
-        
+
+=======
+      if (memoryCache.pos < 16) { // hay espacio en la cache
+>>>>>>> f2f98cc65150d530ab77cab224a6bef1584f3f28
         memoryCache.blocks[memoryCache.pos]->v = 1;
         memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
         memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
         salida.miss++;
-
+        memoryCache.setLeasRecentlyUsed(Direccion.blockAddress);
+      }
+      else{
+          int z = memoryCache.getPosAddress(memoryCache.getLeasRecentlyUsed()) ;
+          memoryCache.blocks[z]->v = 1;
+          memoryCache.blocks[z]->address = Direccion.blockAddress;
+          memoryCache.blocks[z]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
+          salida.miss++;
+          memoryCache.setLeasRecentlyUsed(Direccion.blockAddress);
       }
     }
 
