@@ -201,12 +201,9 @@ class Output {
 
     updateOutput(string address, string data) {
 
-      /*string linea;
-      std::ifstream file("Output.txt");
-      file.close();*/
       ofstream file;
-      file.open("Output.txt");
-      file << address << " " << data << " " << endl;
+      file.open("Output.txt", std::ofstream::app);
+      file << "| " << address << " | " << data << " |" << endl;
       file.close();
       hits++;
 
@@ -240,11 +237,7 @@ void Gen( PhysicalAddress & direccion ) {
     direccion.offset = aux2;
 }
 
-void modificarValor( Cache & memoryCache ) {
 
-  memoryCache.blocks[0]->v = 0;
-
-}
 
 void leerDataMemoryMain( MemoryMain & memoryMain ) {
 
@@ -296,8 +289,8 @@ int main( int argc, char const *argv[] ) { // menu infinito
   Cache memoryCache;
   MemoryMain memoryMain;
   Output salida;
-
-
+  salida.updateOutput("10101101110", "01010110");
+  return 0;
   string input = "";
   while ( input != "E" ) {
 
