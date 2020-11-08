@@ -25,7 +25,7 @@
 
 ## Contruido con 🛠️
   * Python3 o C++
-  
+
 ## MemoryCache
 
   * FA WT LFU
@@ -35,6 +35,5 @@
        the lower level of the memory hierarchy (main memory for a cache).
 
 # Notas
- * Revisar escritura en el Output
  * Politicas de reemplazo
  * Actualización

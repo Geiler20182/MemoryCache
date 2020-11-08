@@ -9,6 +9,7 @@
 */
 
 /* Librerias necesarias */
+
 #include <iostream>
 #include <vector>
 #include <string.h>
@@ -153,7 +154,6 @@ class Cache {
 
 */
 
-
 class MemoryMain {
 
   public:
@@ -184,13 +184,17 @@ class MemoryMain {
 
 };
 
-
+/*
+ * Estructura output:
+   Estructura escargada de almacenar la cantidad de hit y miss que
+   ocurren en la ejecución, también atualiza el archivo Output.txt
+*/
 class Output {
 
   public:
 
-    int hits;
-    int miss;
+    unsigned int hits;
+    unsigned int miss;
 
     Output() {
 
@@ -211,6 +215,7 @@ class Output {
 
 
 };
+
 // +++ Manejar todas los paramteros de las funciones como referencia +++ //
 
 /* Firmas de funciones */
@@ -222,6 +227,7 @@ void Gen( PhysicalAddress & );
 /* Definición de funciones */
 
 void Gen( PhysicalAddress & direccion ) {
+
     string aux="";
     string aux2="";
 
@@ -235,9 +241,8 @@ void Gen( PhysicalAddress & direccion ) {
         aux2+=to_string(n);
     }
     direccion.offset = aux2;
+
 }
-
-
 
 void leerDataMemoryMain( MemoryMain & memoryMain ) {
 
@@ -259,25 +264,28 @@ int inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
     PhysicalAddress Direccion;
     Gen(Direccion);
 
-    cout << "\nDireccion generada: " << Direccion.blockAddress << " dec: " << stoi(Direccion.offset.c_str(), 0, 2) << '\n';
+    //cout << "\nDireccion generada: " << Direccion.blockAddress << " dec: " << stoi(Direccion.offset.c_str(), 0, 2) << '\n';
     int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
     if (memoryCache.isHit(x)) {
 
-        cout << "*\n";
-        cout << "x: " << x << endl;
-        salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2)] );
+        cout << "Hit: " << x << endl;
+        cout << "Cantidad data: " <<  memoryCache.blocks[x]->data.size() << endl;
+        cout << "offset: " << stoi(Direccion.offset.c_str(), 0, 2) << endl;
+        salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2) ] ); // *** - 1
+        cout << "----------------\n";
     }
 
     else {
 
-      cout << "pos: " << memoryCache.pos << endl;
-      if (memoryCache.pos < 16) {
-
+      //cout << "pos: " << memoryCache.pos << endl;
+      if (memoryCache.pos < 15) {
+        cout << "Miss - Pos: " << memoryCache.pos << endl;
         memoryCache.blocks[memoryCache.pos]->v = 1;
         memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
-        memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData(3, 8);
+        memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData(3, 10);
         salida.miss++;
-        cout << "Miss\n";
+
+
       }
     }
 
@@ -290,6 +298,12 @@ int main( int argc, char const *argv[] ) { // menu infinito
   MemoryMain memoryMain;
   Output salida;
   string input = "";
+
+  int N = 1000;
+  while (N-- > 0) {
+    inicio(memoryCache, memoryMain, salida);
+  }
+  /*
   while ( input != "E" ) {
 
     cout << "\nMemoria cache\n";
@@ -300,7 +314,7 @@ int main( int argc, char const *argv[] ) { // menu infinito
     if (input == "G")
       inicio(memoryCache, memoryMain, salida);
 
-  }
+  }*/
 
   cout << "Taza" << '\n';
   cout << "Hits: " << salida.hits << '\n';
