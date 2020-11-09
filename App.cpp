@@ -156,7 +156,7 @@ class Cache {
      else return false;
    }
 
-   void write( const int pos, vector<string>  data, string blockAddress) {
+   void write( const int pos, vector<string> data, string blockAddress) {
 
      this->blocks[pos]->v = 1;
      this->blocks[pos]->address = blockAddress;
@@ -164,6 +164,22 @@ class Cache {
      this->setLeasRecentlyUsed(blockAddress);
 
    }
+   void writeHits( const int pos, string  data, PhysicalAddress blockAddress) {
+
+     this->blocks[pos]->v = 1;
+     this->blocks[pos]->address = blockAddress.blockAddress;
+     this->blocks[pos]->data[stoi(blockAddress.offset, 0, 2)] = data;
+     this->setLeasRecentlyUsed(blockAddress.blockAddress);
+
+   }
+   /*void writeMiss( const int pos, string  data, PhysicalAddress blockAddress) {
+
+     this->blocks[pos]->v = 1;
+     this->blocks[pos]->address = blockAddress.blockAddress;
+     this->blocks[pos]->data[stoi(blockAddress.offset, 0, 2)] = data;
+     this->setLeasRecentlyUsed(blockAddress.blockAddress);
+
+   }*/
 
 };
 
@@ -305,6 +321,7 @@ void outputCache( Cache & memoryCache, Output & salida) {
   file.close();
 
 }
+
 void Gen( PhysicalAddress & direccion ) {
 
     direccion.blockAddress = bitsAleatorios(MAX_ADDRESS);
@@ -345,52 +362,66 @@ vector<string> openInput(string nameFile) {
 
 }
 
-void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
+void writeMemory(Cache & memoryCache, MemoryMain & memoryMain, Output & salida) {
 
-  string address, input;
-  vector<string> temp, data;
+  string address, input, data;
   int pos, x, y, i;
 
   /* Aleatoria */
+  cout << "Ingrese la direccion (11bits): ";
+  cin >> address;
+  cout << "Ingrese el data: ";
+  cin >> data;
 
-  for(i = 0; i <= MAX_DATA; i++)
-    temp.push_back( bitsAleatorios(MAX_ADDRESS));
+  PhysicalAddress tmp;
 
-  /* fin aleatoria */
+  for (int i = 0; i < 8; i++)
+    tmp.blockAddress += address[i];
 
-  /* Manual */
-
-
-  //input = "input1.txt";
-  //cout << "Ingrese el nombre del archivo de entrada (.txt)\n> ";
-  //cin >> input;
-  //temp = openInput(input);
+  for (int  i = 8; i < 12; i++)
+    tmp.offset += address[i];
 
   /* fin manual */
 
-  address = temp[0];
-  for (int i = 1; i < temp.size(); i++)
-    data.push_back(temp[i]);
+  //for (int i = 1; i < temp.size(); i++)
+  //    data.push_back(temp[i]);
 
-  pos = memoryCache.getPosAddress(address);
+  pos = memoryCache.getPosAddress(tmp.blockAddress);
 
   /* Escritura en cache */
 
-  if (pos == -1 && memoryCache.pos < 16)
+  if (pos == -1 && memoryCache.pos < 16) {
     pos = memoryCache.pos++;
+    vector<string> aux = memoryMain.getData(tmp.getRangeInf(), tmp.getRangeSup());
+    aux[stoi(tmp.offset, 0, 2)] = data;
+    memoryCache.write(pos, aux, tmp.blockAddress);
+    memoryCache.setLeasRecentlyUsed(tmp.blockAddress);
+    salida.miss++;
 
-  else if (pos == -1 && memoryCache.pos == 16)
-      pos = memoryCache.getPosAddress(memoryCache.getLeasRecentlyUsed());
+  }
 
-  memoryCache.write(pos, data, address);
+  else if (pos == -1 && memoryCache.pos == 16) {
+    pos = memoryCache.getPosAddress(memoryCache.getLeasRecentlyUsed());
+    vector<string> aux = memoryMain.getData(tmp.getRangeInf(), tmp.getRangeSup());
+    aux[stoi(tmp.offset, 0, 2)] = data;
+    memoryCache.write(pos, aux, tmp.blockAddress);
+    memoryCache.setLeasRecentlyUsed(tmp.blockAddress);
+    salida.miss++;
+  }
 
-  PhysicalAddress phyAddress(address, "000");
-  x = phyAddress.getRangeInf();
-  y = phyAddress.getRangeSup();
+  else {
+    memoryCache.setLeasRecentlyUsed(tmp.blockAddress);
+    salida.updateOutput(tmp.blockAddress, tmp.offset,  data ); // *** - 1
+    memoryCache.writeHits(pos, data, tmp);
+ }
+  //PhysicalAddress phyAddress(address, "000");
+  x = tmp.getRangeInf();
+  y = tmp.getRangeSup();
 
   /* Escritura en memoria principal */
-
-  memoryMain.write(x, y, data);
+  vector<string> aux = memoryMain.getData(x, y);
+  aux[stoi(tmp.offset, 0, 2)] = data;
+  memoryMain.write(x, y, aux);
 
 
 }
@@ -399,7 +430,16 @@ void  inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
     leerDataMemoryMain( memoryMain );
     PhysicalAddress Direccion;
-    Gen(Direccion);
+
+    string address, offset;
+    cout << "Ingrese la direcciion: ";
+    cin >> address;
+    cout << "Ingrese el offset: ";
+    cin >> offset;
+    //Gen(Direccion);
+    Direccion.blockAddress = address;
+    Direccion.offset = offset;
+
     int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
 
     if (memoryCache.isHit(x)) {
@@ -467,7 +507,7 @@ int main( int argc, char const *argv[] ) { // menu infinito
       cout << "\n+ Cuantas escrituras desea realizar?\n> ";
       cin >> n;
       for (i = 0; i < n; i++) {
-        writeMemory(memoryCache, memoryMain);
+        writeMemory(memoryCache, memoryMain, salida);
         outputCache(memoryCache, salida);
       }
     }
