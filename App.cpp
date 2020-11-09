@@ -53,7 +53,9 @@ class Block {
     vector<string> data;
 
     /* Contructor */
-    Block() { }
+    Block() {
+      v = 0;
+    }
 
 };
 
@@ -165,7 +167,6 @@ class Cache {
 
 };
 
-
 /*
  * Estructura generador de direcciones:
     Estructura encargada de generar de manera aleatoria direcciones fisicas.
@@ -181,7 +182,6 @@ class MemoryMain {
 
     /* Construtor */
     MemoryMain() {};
-
 
     vector<string> getData( const int x, const int y ) {
 
@@ -267,21 +267,46 @@ void Gen( PhysicalAddress & );
 
 /* Definición de funciones */
 
+string bitsAleatorios(int limit) {
+
+  string aux;
+  int i, n;
+
+  for (i = 0; i < limit; i++) {
+      n = rand() % 2;
+      aux += to_string(n);
+  }
+
+  return aux;
+}
+
+void outputCache( Cache & memoryCache, Output & salida) {
+
+  std::ofstream file("OutputCache.txt");
+
+  for (int i = 0; i < MAX_BLOCKS; i++) {
+
+    file << memoryCache.blocks[i]->v << " | ";
+    file << memoryCache.blocks[i]->address <<  " | [";
+
+    for (int j = 0; j < memoryCache.blocks[i]->data.size(); j++) {
+      file << memoryCache.blocks[i]->data[j] << " ";
+
+    }
+    file << "]\n";
+
+  }
+  file << "\nHits: " << salida.hits << "\n";
+  file << "Miss: " << salida.miss << "\n";
+
+  file.close();
+
+}
 void Gen( PhysicalAddress & direccion ) {
 
-    string aux="";
-    string aux2="";
+    direccion.blockAddress = bitsAleatorios(MAX_ADDRESS);
+    direccion.offset = bitsAleatorios(OFFSET);
 
-    for (int i = 0; i < MAX_ADDRESS; i++) {
-        int n = rand() % 2;
-        aux+=to_string(n);
-    }
-    direccion.blockAddress = aux;
-    for (int i = 0; i < OFFSET; i++) {
-        int n = rand() % 2;
-        aux2+=to_string(n);
-    }
-    direccion.offset = aux2;
 }
 
 void leerDataMemoryMain( MemoryMain & memoryMain ) {
@@ -319,14 +344,29 @@ vector<string> openInput(string nameFile) {
 
 void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
 
-  string input = "input1.txt";
+  string address, input;
   vector<string> temp, data;
-  temp = openInput(input);
-
-  string address = temp[0];
-
   int pos, x, y, i;
 
+  /* Aleatoria */
+
+  //for(i = 0; i <= MAX_DATA; i++)
+  //  temp.push_back( bitsAleatorios(MAX_ADDRESS));
+
+  /* fin aleatoria */
+
+  /* Manual */
+
+
+  //input = "input1.txt";
+  cout << "Ingrese el nombre del archivo de entrada (.txt)\n> ";
+  cin >> input;
+  temp = openInput(input);
+
+  /* fin manual */
+
+
+  address = temp[0];
   for (int i = 1; i < temp.size(); i++)
     data.push_back(temp[i]);
 
@@ -360,7 +400,6 @@ void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
 
 
 }
-
 
 void  inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
@@ -402,35 +441,44 @@ int main( int argc, char const *argv[] ) { // menu infinito
   MemoryMain memoryMain;
   Output salida;
   string input = "";
-  int N = 100;
+  int n, i;
 
-  writeMemory(memoryCache, memoryMain);
-
-  return 0;
-
-  /*while (N-- > 0) {
-
-    //inicio(memoryCache, memoryMain, salida);
-  }*/
-
-  /*
   while ( input != "E" ) {
 
     cout << "\nMemoria cache\n";
-    cout << "[G] Generar direccion\n";
-    cout << "[W] Escrbir"
+    cout << "[G] Lectura\n";
+    cout << "[W] Escrbir\n";
     cout << "[E] Salir\n> ";
     cin >> input;
 
-    if (input == "G")
-      inicio(memoryCache, memoryMain, salida);
+    if (input == "G") {
 
-  }*/
+      cout << "\nCuantas lecturas desea realizar?\n> ";
 
-  cout << "Taza" << '\n';
+      cin >> n;
+      for (i = 0; i < n; i++) {
+        inicio(memoryCache, memoryMain, salida);
+      }
+      outputCache(memoryCache, salida);
+
+    }
+    else if(input == "W") {
+
+      cout << "\nCuantas escrituras desea realizar?\n> ";
+      cin >> n;
+      for (i = 0; i < n; i++) {
+        writeMemory(memoryCache, memoryMain);
+        outputCache(memoryCache, salida);
+      }
+    }
+
+
+  }
+
+/*  cout << "Taza" << '\n';
   cout << "Hits: " << salida.hits << '\n';
   cout << "Miss: " << salida.miss << '\n';
-
+*/
 
   return 0;
 }

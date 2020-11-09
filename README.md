@@ -35,5 +35,4 @@
        the lower level of the memory hierarchy (main memory for a cache).
 
 # Notas
- * Politicas de reemplazo
- * Actualización
+ * Realizar pruebas
