@@ -54,14 +54,7 @@ class Block {
 
     /* Contructor */
     Block() { }
-/*
->>>>>>> 5c3252fdc50fbfb4d6c9eed87931b2d153462833
-    Block(int newV, string newAddress) {
 
-      v = newV;
-      address = newAddress;
-
-    }*/
 };
 
 /*
@@ -161,6 +154,15 @@ class Cache {
      else return false;
    }
 
+   void write( const int pos, vector<string>  data, string blockAddress) {
+
+     this->blocks[pos]->v = 1;
+     this->blocks[pos]->address = blockAddress;
+     this->blocks[pos]->data = data;
+     this->setLeasRecentlyUsed(blockAddress);
+
+   }
+
 };
 
 
@@ -196,6 +198,31 @@ class MemoryMain {
       return information;
     }
 
+    void write(const int x, const int y, vector<string> data) {
+
+      string linea;
+      int i, k;
+      vector<string> tmp;
+      std::ifstream file("MemoryMain.txt");
+
+      while (!file.eof()) {
+
+        file >> linea;
+        tmp.push_back(linea);
+
+      }
+      file.close();
+
+      for (k = 0, i = x; i <= y; i++, k++)
+        tmp[i] = data[k];
+
+      std::ofstream fileWrite("MemoryMain.txt");
+
+       for (i = 0; i < tmp.size(); i++)
+        fileWrite << tmp[i] << endl;
+
+       fileWrite.close();
+    }
 
 };
 
@@ -206,7 +233,7 @@ class MemoryMain {
 */
 class Output {
 
-  public:
+   public:
 
     unsigned int hits;
     unsigned int miss;
@@ -255,7 +282,6 @@ void Gen( PhysicalAddress & direccion ) {
         aux2+=to_string(n);
     }
     direccion.offset = aux2;
-
 }
 
 void leerDataMemoryMain( MemoryMain & memoryMain ) {
@@ -274,14 +300,75 @@ void leerDataMemoryMain( MemoryMain & memoryMain ) {
 
 }
 
+vector<string> openInput(string nameFile) {
+
+  string aux;
+  vector<string> data;
+  std::ifstream file(nameFile);
+
+  for (int i = 0; i <= MAX_DATA ; i++) {
+    file >> aux;
+    data.push_back(aux);
+  }
+
+  file.close();
+
+  return data;
+
+}
+
+void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
+
+  string input = "input1.txt";
+  vector<string> temp, data;
+  temp = openInput(input);
+
+  string address = temp[0];
+
+  int pos, x, y, i;
+
+  for (int i = 1; i < temp.size(); i++)
+    data.push_back(temp[i]);
+
+  pos = memoryCache.getPosAddress(address);
+
+  /* Escritura en cache */
+
+  if (pos == -1 && memoryCache.pos < 16)
+    pos = memoryCache.pos++;
+
+  else if (pos == -1 && memoryCache.pos == 16)
+      pos = memoryCache.getPosAddress(memoryCache.getLeasRecentlyUsed());
+
+  memoryCache.write(pos, data, address);
+
+  PhysicalAddress phyAddress(address, "000");
+  x = phyAddress.getRangeInf();
+  y = phyAddress.getRangeSup();
+
+  memoryMain.write(x, y, data);
+
+  cout <<"\nData Cache [0]\n";
+
+  cout << "V: " << memoryCache.blocks[0]->v << endl;
+  cout << "Address: " << memoryCache.blocks[0]->address << endl;
+  for (i = 0; i <  memoryCache.blocks[0]->data.size(); i++) {
+    cout <<  memoryCache.blocks[0]->data[i] << " ";
+  }
+  cout << endl;
+  /* Escritura en memoria principal */
+
+
+}
+
+
 void  inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
     leerDataMemoryMain( memoryMain );
     PhysicalAddress Direccion;
     Gen(Direccion);
-
-    //cout << "\nDireccion generada: " << Direccion.blockAddress << " dec: " << stoi(Direccion.offset.c_str(), 0, 2) << '\n';
     int x = memoryCache.getPosAddress(Direccion.blockAddress); // si esta la direccion en la Cache
+
     if (memoryCache.isHit(x)) {
 
         salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2) ] ); // *** - 1
@@ -290,49 +377,48 @@ void  inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
     else {
 
-<<<<<<< HEAD
-      //cout << "pos: " << memoryCache.pos << endl;
-      if (memoryCache.pos < 16) {
 
-=======
-      if (memoryCache.pos < 16) { // hay espacio en la cache
->>>>>>> f2f98cc65150d530ab77cab224a6bef1584f3f28
-        memoryCache.blocks[memoryCache.pos]->v = 1;
-        memoryCache.blocks[memoryCache.pos]->address = Direccion.blockAddress;
-        memoryCache.blocks[memoryCache.pos++]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
-        salida.miss++;
-        memoryCache.setLeasRecentlyUsed(Direccion.blockAddress);
-      }
+      if (memoryCache.pos < 16)
+        memoryCache.write(memoryCache.pos++, memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup()), Direccion.blockAddress);
+
       else{
+
           int z = memoryCache.getPosAddress(memoryCache.getLeasRecentlyUsed()) ;
-          memoryCache.blocks[z]->v = 1;
-          memoryCache.blocks[z]->address = Direccion.blockAddress;
-          memoryCache.blocks[z]->data = memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup());
-          salida.miss++;
-          memoryCache.setLeasRecentlyUsed(Direccion.blockAddress);
+          memoryCache.write(z, memoryMain.getData( Direccion.getRangeInf(), Direccion.getRangeSup()), Direccion.blockAddress);
+
       }
+      salida.miss++;
     }
 
 }
 
+
 int main( int argc, char const *argv[] ) { // menu infinito
+
+  srand(time(NULL));
 
   /* Creando instancia de estructura Cache */
   Cache memoryCache;
   MemoryMain memoryMain;
   Output salida;
   string input = "";
-  int N = 1000;
-  while (N-- > 0) {
+  int N = 100;
 
-    inicio(memoryCache, memoryMain, salida);
+  writeMemory(memoryCache, memoryMain);
 
-  }
+  return 0;
+
+  /*while (N-- > 0) {
+
+    //inicio(memoryCache, memoryMain, salida);
+  }*/
+
   /*
   while ( input != "E" ) {
 
     cout << "\nMemoria cache\n";
     cout << "[G] Generar direccion\n";
+    cout << "[W] Escrbir"
     cout << "[E] Salir\n> ";
     cin >> input;
 
@@ -345,7 +431,6 @@ int main( int argc, char const *argv[] ) { // menu infinito
   cout << "Hits: " << salida.hits << '\n';
   cout << "Miss: " << salida.miss << '\n';
 
-  srand(time(NULL));
 
   return 0;
 }
