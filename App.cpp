@@ -229,14 +229,14 @@ class MemoryMain {
 /*
  * Estructura output:
    Estructura escargada de almacenar la cantidad de hit y miss que
-   ocurren en la ejecución, también atualiza el archivo Output.txt
+   ocurren en la ejecución, también atualiza el archivo OutputHits.txt
 */
 class Output {
 
    public:
 
-    unsigned int hits;
-    unsigned int miss;
+    double hits;
+    double miss;
 
     Output() {
 
@@ -245,11 +245,11 @@ class Output {
 
     }
 
-    void updateOutput(string address, string data) {
+    void updateOutput(string address, string offset, string data) {
 
       ofstream file;
-      file.open("Output.txt", std::ofstream::app);
-      file << "| " << address << " | " << data << " |" << endl;
+      file.open("OutputHits.txt", std::ofstream::app);
+      file << "| " << address << " |  " << offset << "   | " << data << " |" << endl;
       file.close();
       hits++;
 
@@ -296,9 +296,12 @@ void outputCache( Cache & memoryCache, Output & salida) {
     file << "]\n";
 
   }
-  file << "\nHits: " << salida.hits << "\n";
+  file << "\nCantidad:\n";
+  file << "Hits: " << salida.hits  << "\n";
   file << "Miss: " << salida.miss << "\n";
-
+  file << "Tasa:\n";
+  file << "T. hits: " << (salida.hits / (salida.hits + salida.miss)) * 100   << "%\n";
+  file << "T. miss: " << (salida.miss /(salida.hits + salida.miss)) * 100 << "%\n";
   file.close();
 
 }
@@ -350,8 +353,8 @@ void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
 
   /* Aleatoria */
 
-  //for(i = 0; i <= MAX_DATA; i++)
-  //  temp.push_back( bitsAleatorios(MAX_ADDRESS));
+  for(i = 0; i <= MAX_DATA; i++)
+    temp.push_back( bitsAleatorios(MAX_ADDRESS));
 
   /* fin aleatoria */
 
@@ -359,12 +362,11 @@ void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
 
 
   //input = "input1.txt";
-  cout << "Ingrese el nombre del archivo de entrada (.txt)\n> ";
-  cin >> input;
-  temp = openInput(input);
+  //cout << "Ingrese el nombre del archivo de entrada (.txt)\n> ";
+  //cin >> input;
+  //temp = openInput(input);
 
   /* fin manual */
-
 
   address = temp[0];
   for (int i = 1; i < temp.size(); i++)
@@ -386,17 +388,9 @@ void writeMemory(Cache & memoryCache, MemoryMain & memoryMain) {
   x = phyAddress.getRangeInf();
   y = phyAddress.getRangeSup();
 
-  memoryMain.write(x, y, data);
-
-  cout <<"\nData Cache [0]\n";
-
-  cout << "V: " << memoryCache.blocks[0]->v << endl;
-  cout << "Address: " << memoryCache.blocks[0]->address << endl;
-  for (i = 0; i <  memoryCache.blocks[0]->data.size(); i++) {
-    cout <<  memoryCache.blocks[0]->data[i] << " ";
-  }
-  cout << endl;
   /* Escritura en memoria principal */
+
+  memoryMain.write(x, y, data);
 
 
 }
@@ -410,7 +404,7 @@ void  inicio(Cache & memoryCache, MemoryMain & memoryMain, Output & salida ){
 
     if (memoryCache.isHit(x)) {
 
-        salida.updateOutput(Direccion.blockAddress, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2) ] ); // *** - 1
+        salida.updateOutput(Direccion.blockAddress, Direccion.offset, memoryCache.blocks[x]->data[stoi(Direccion.offset.c_str(), 0, 2) ] ); // *** - 1
         memoryCache.setLeasRecentlyUsed(Direccion.blockAddress);
     }
 
@@ -440,20 +434,26 @@ int main( int argc, char const *argv[] ) { // menu infinito
   Cache memoryCache;
   MemoryMain memoryMain;
   Output salida;
-  string input = "";
+  char input;
   int n, i;
 
-  while ( input != "E" ) {
 
-    cout << "\nMemoria cache\n";
-    cout << "[G] Lectura\n";
-    cout << "[W] Escrbir\n";
-    cout << "[E] Salir\n> ";
+  while ( input != 'E' ) {
+
+
+    cout << "\n+------------------------------------------------+\n";
+    cout << "|              MEMORIA CACHE                     |\n";
+    cout << "+------------------------------------------------+\n";
+    cout << "| [L] Lectura                                    |\n";
+    cout << "| [W] Escrbir                                    |\n";
+    cout << "| [E] Salir                                      |\n";
+    cout << "+------------------------------------------------+\n> ";
+
     cin >> input;
+    input = toupper(input);
+    if (input == 'L') {
 
-    if (input == "G") {
-
-      cout << "\nCuantas lecturas desea realizar?\n> ";
+      cout << "\n+ Cuantas lecturas desea realizar?\n> ";
 
       cin >> n;
       for (i = 0; i < n; i++) {
@@ -462,9 +462,9 @@ int main( int argc, char const *argv[] ) { // menu infinito
       outputCache(memoryCache, salida);
 
     }
-    else if(input == "W") {
+    else if(input == 'W') {
 
-      cout << "\nCuantas escrituras desea realizar?\n> ";
+      cout << "\n+ Cuantas escrituras desea realizar?\n> ";
       cin >> n;
       for (i = 0; i < n; i++) {
         writeMemory(memoryCache, memoryMain);
@@ -474,11 +474,6 @@ int main( int argc, char const *argv[] ) { // menu infinito
 
 
   }
-
-/*  cout << "Taza" << '\n';
-  cout << "Hits: " << salida.hits << '\n';
-  cout << "Miss: " << salida.miss << '\n';
-*/
 
   return 0;
 }
